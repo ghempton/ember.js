@@ -4,6 +4,7 @@
 // License:   Licensed under MIT license (see license.js)
 // ==========================================================================
 
+require("ember-handlebars/controls/control");
 require("ember-handlebars/controls/checkbox");
 require("ember-handlebars/controls/text_field");
 require("ember-handlebars/controls/button");
