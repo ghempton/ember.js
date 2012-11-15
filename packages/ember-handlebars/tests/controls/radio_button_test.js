@@ -28,16 +28,16 @@ test("setting selectedValue should update the checked property", function() {
 
   appendView();
 
-  strictEqual(view.$().is(":checked"), false, "precond - the element is not checked");
-  strictEqual(get(view, "isChecked"), false, "precond - isChecked returns false");
+  strictEqual(view.$().prop('checked'), false, "precond - the element is not checked");
+  strictEqual(get(view, "checked"), false, "precond - checked returns false");
 
   set(view, 'selectedValue', 'tahoe');
 
-  ok(view.$().is(":checked"), "after clicking a radio button, the checked property changed in the DOM.");
-  equal(get(view, "isChecked"), true, "after clicking a radio button, the isChecked property changed in the view.");
+  ok(view.$().prop('checked'), "after clicking a radio button, the checked property changed in the DOM.");
+  equal(get(view, "checked"), true, "after clicking a radio button, the checked property changed in the view.");
 });
 
-test("setting isChecked should update the selected value", function() {
+test("setting checked should update the selected value", function() {
   view = Ember.RadioButton.create({
     name: 'radio_button',
     value: 'tahoe'
@@ -46,10 +46,10 @@ test("setting isChecked should update the selected value", function() {
   appendView();
 
   Ember.run(function() {
-    set(view, 'isChecked', true);
+    set(view, 'checked', true);
   });
 
-  ok(view.$().is(":checked"), "checked attribute should be set");
+  ok(view.$().prop('checked'), "checked attribute should be set");
   equal(get(view, 'selectedValue'), 'tahoe', 'selectedValue should be set');
 });
 
@@ -89,8 +89,16 @@ test("value should update correctly", function() {
   });
 
   equal(get(view, 'value'), 'option1', 'value should be set');
-  equal(view.$("[value='option1']").attr('checked'), 'checked', 'checkbox should be checked');
-  equal(view.$("[value='option2']").attr('checked'), null, 'checkbox should not be checked');
+  equal(view.$("[value='option1']").prop('checked'), true, 'checkbox should be checked');
+  equal(view.$("[value='option2']").prop('checked'), false, 'checkbox should not be checked');
+
+  Ember.run(function() {
+    set(view, 'value', 'option2');
+  });
+
+  equal(get(view, 'value'), 'option2', 'value should be set');
+  equal(view.$("[value='option2']").prop('checked'), true, 'checkbox should be checked');
+  equal(view.$("[value='option1']").prop('checked'), false, 'checkbox should not be checked');
 });
 
 test("value should work even if the view is not in the DOM", function() {
@@ -109,8 +117,8 @@ test("value should work even if the view is not in the DOM", function() {
   appendView();
 
   equal(get(view, 'value'), 'option1', 'value should be set');
-  equal(view.$("[value='option1']").attr('checked'), 'checked', 'checkbox should be checked');
-  equal(view.$("[value='option2']").attr('checked'), null, 'checkbox should not be checked');
+  equal(view.$("[value='option1']").prop('checked'), true, 'checkbox should be checked');
+  equal(view.$("[value='option2']").prop('checked'), false, 'checkbox should not be checked');
 });
 
 test("should uncheck previous selection when new value is null", function() {
@@ -130,8 +138,8 @@ test("should uncheck previous selection when new value is null", function() {
   });
 
   equal(get(view, 'value'), null, 'value should be set');
-  equal(view.$("[value='option1']").attr('checked'), null, 'checkbox should not be checked');
-  equal(view.$("[value='option2']").attr('checked'), null, 'checkbox should not be checked');
+  equal(view.$("[value='option1']").prop('checked'), false, 'checkbox should not be checked');
+  equal(view.$("[value='option2']").prop('checked'), false, 'checkbox should not be checked');
 });
 
 test("value should update correctly after change event", function() {
@@ -153,10 +161,34 @@ test("value should update correctly after change event", function() {
     button[0].click();
   } else {
     button.trigger('click');
-    button.attr('checked', 'checked').trigger('change');
+    button.prop('checked', true).trigger('change');
   }
 
   equal(get(view, 'value'), 'option1', 'value should be set');
-  equal(view.$("[value='option1']").attr('checked'), 'checked', 'checkbox should be checked');
-  equal(view.$("[value='option2']").attr('checked'), null, 'checkbox should not be checked');
+  equal(view.$("[value='option1']").prop('checked'), true, 'checkbox should be checked');
+  equal(view.$("[value='option2']").prop('checked'), false, 'checkbox should not be checked');
+});
+
+test("checked property is removed when value changes to an unknown value", function() {
+  view = Ember.RadioButtonGroup.create({
+    name: 'testName',
+    template: Ember.Handlebars.compile(
+      '{{ view RadioButton value="option1" }}' 
+    )
+  });
+
+  appendView();
+
+  var button1 = view.$("[value='option1']");
+
+  Ember.run(function() {
+    set(view, 'value', 'option1');
+  });
+  equal(button1.prop('checked'), true, "option1 should be checked");
+
+  Ember.run(function() {
+    set(view, 'value', 'foobar');
+  });
+
+  equal(button1.prop('checked'), false, "option1 should not be checked");
 });
