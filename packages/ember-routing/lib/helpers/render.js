@@ -5,6 +5,7 @@
 
 var get = Ember.get, set = Ember.set;
 
+require("ember-routing/system/wire_mvc");
 require('ember-handlebars/helpers/view');
 
 Ember.onLoad('Ember.Handlebars', function(Handlebars) {
